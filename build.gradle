@@ -1,31 +1,34 @@
-plugins {
-    id "scala"
-    // test runner for scalatest
-    id "com.github.maiflai.scalatest" version "0.18"
-    // create a "fat jar" similar to the sbt assembly plugin
-    id "com.github.johnrengelman.shadow" version "2.0.1"
-    // make application runnable from the terminal with a `run` task
-    id "application"
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.adtran:scala-multiversion-plugin:1.0.32"
+    }
 }
 
-// inform the 'application' plugin where the app entry point is located
-mainClassName = "com.lombardo.Main"
-
-shadowJar {
-    // creates a fat jar at build/libs/scala-multiversion-example-all.jar
-    baseName = "scala-multiversion-example"
+plugins {
+    id "scala"
+    id "com.github.maiflai.scalatest" version "0.18"
+    id "com.adtran.scala-multiversion-plugin" version "1.0.32"
+    id "net.researchgate.release" version "2.6.0"
 }
 
 repositories {
     mavenCentral()
 }
 
-def scalaVersion = "2.12.4"
+release {
+    newVersionCommitMessage = "Prepare next release using scala version $scalaVersion"
+}
+
+tasks.withType(Test) {
+    println("Running Test task using scala version $scalaVersion")
+}
 
 dependencies {
-    compile "org.scala-lang:scala-library:$scalaVersion"
-    compile "org.scala-lang:scala-reflect:$scalaVersion"
-    testCompile "org.scalatest:scalatest_2.12:3.0.1"
-    // the test runner creates nifty html reports using this dependency
+    compile "org.scala-lang:scala-library:%scala-version%"
+    compile "org.scala-lang:scala-reflect:%scala-version%"
+    testCompile "org.scalatest:scalatest_%%:3.0.1"
     testRuntime "org.pegdown:pegdown:1.4.2"
 }
